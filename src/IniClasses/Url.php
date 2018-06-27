@@ -62,12 +62,20 @@ class Url extends Vars{
     protected function loadModuleIni($name,$autoLoadMore=true)
     {
         $tmp = $this->simpleHttpGet($this->_url.$name);
-        if(is_array($tmp)){
-            foreach($tmp as $k=>$v){
-                $this->_vars[$k] = $v;
-                if($autoLoadMore && !empty($v[$this->_nameNeedsMore])){
-                    $this->loadModuleIni($v[$this->_nameNeedsMore]);
+        if(!is_array($tmp)){
+            return;
+        }
+        
+        foreach($tmp as $k=>$v){
+            $this->_vars[$k] = $v;
+            if($autoLoadMore && !empty($v[$this->_nameNeedsMore])){
+                $ks = explode(",", $v[$this->_nameNeedsMore]);
+                foreach($ks as $i=>$s){
+                    if(isset($tmp[$s])){
+                        unset($ks[$i]);
+                    }
                 }
+                $this->loadModuleIni(implode(',', $ks));
             }
         }
     }

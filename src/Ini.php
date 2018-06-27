@@ -81,4 +81,9 @@ class Ini{
     {
         return $this->runtime->sets($k, $v);
     }
+    
+    public function onNewRequest()
+    {
+        $this->runtime->free();
+    }
 }
