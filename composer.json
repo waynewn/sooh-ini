@@ -2,14 +2,14 @@
 
     "name": "steady-as-hill/sooh-ini",
     "description": "ini manage",
-    "keywords":         ["ini "],
+    "keywords":         ["ini"],
     "license":          "MIT",
     "require": {
 
     },
     "autoload": {
       "psr-4": { "Sooh\\IniClasses\\": "src/IniClasses" },
-        "classmap":["src/Ini"]
+        "classmap":["src/Ini.php"]
     }
 }
 
