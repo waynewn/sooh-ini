@@ -61,4 +61,9 @@ class Vars{
     }
     
     public function reload(){}
+    
+    public function dump()
+    {
+        return $this->_vars;
+    }
 }

@@ -12,30 +12,39 @@ class Files extends Vars{
         $this->reload();
     }
     public function reload(){
-        $this->_vars[$this->_mainModule] = $this->loadModuleIni($this->_mainModule);
-        
-        if(!empty($this->loaded[$this->_mainModule][$this->_nameNeedsMore])){
-            $s = $this->loaded[$this->_mainModule][$this->_nameNeedsMore];
-            if($s == "*"){
-                $this->loadAllIni();
+        if(empty($this->_vars)){
+            if(empty($this->_mainModule)){
+                return;
             }else{
-                $ks = explode(',', $s);
-                foreach($ks as $k){
-                    $this->_vars[$k] = $this->loadModuleIni($k);
-                }
+                $this->loadModuleIni($this->_mainModule);
+            }
+        }else{
+            $ks = array_keys($this->_vars);
+            foreach($ks as $k){
+                $this->loadModuleIni($k, false);
             }
         }
     }
     
-    protected function loadModuleIni($name,$dir=null)
+    protected function loadModuleIni($name,$autoLoadMore=true)
     {
-        if($dir===null){
-            $dir = $this->_baseDir;
-        }
+        $dir = $this->_baseDir;
         if(is_dir($dir.'/'.$name)){
-            return $this->loadModuleIniByDir($dir,$name);
+            $this->_vars[$name] = $this->loadModuleIniByDir($dir,$name);
         }else{
-            return $this->loadModuleIniByFile($dir, $name);
+            $this->_vars[$name] = $this->loadModuleIniByFile($dir, $name);
+        }
+        
+        if($autoLoadMore && !empty($this->_vars[$name][$this->_nameNeedsMore])){
+            $s = $this->_vars[$name][$this->_nameNeedsMore];
+            if($s == "*"){
+                $this->loadAllIni($name);
+            }else{
+                $ks = explode(',', $s);
+                foreach($ks as $k){
+                    $this->loadModuleIni($k);
+                }
+            }
         }
     }
     
@@ -60,6 +69,8 @@ class Files extends Vars{
             return $this->loadFile($dir.'/'.$name.'.php'); 
         }elseif(is_file($dir.'/'.$name.'.ini')){
             return $this->loadFile($dir.'/'.$name.'.ini');
+        }else{
+            return null;
         }
     }
 
@@ -72,19 +83,37 @@ class Files extends Vars{
         }
     }
     
-    protected function loadAllIni()
+    protected function loadAllIni($except)
     {
         $tmp  = scandir($this->_baseDir);
         foreach($tmp as $k){
-            if($k[0]=='.'){
+            if($k[0]=='.' || $k==$except){
                 continue;
             }
-            if(is_dir($this->_baseDir.'/'.$k)){
-                $this->loadModuleIniByDir($this->_baseDir, $k);
+            $pos = strpos($k, '.');
+            if($pos===false){
+                $this->loadModuleIni($k);
             }else{
-                $this->loadModuleIniByFile($this->_baseDir, substr($k, 0,strpos($k, '.')));
+                $this->loadModuleIni(substr($k, 0, $pos));
             }
         }
     }
-
+    
+    public function gets($k)
+    {
+        $pos = strpos($k, ".");
+        if($pos===false){
+            $m = $k;
+        }else{
+            $m = substr($k, 0, $pos);
+        }
+        if(!empty($this->_vars[$m])){
+            $this->loadModuleIni($m);
+            if(empty($this->_vars[$m])){
+                error_log("IniMissing : $m");
+                return null;
+            }
+        }
+        return parent::gets($k);
+    }
 }
