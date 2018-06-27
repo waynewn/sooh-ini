@@ -39,7 +39,7 @@ class Ini{
      * 设置三种参数存取的类
      * @param \Sooh\IniClasses\DriverInterface $forStatic
      * @param \Sooh\IniClasses\DriverInterface $forPermanent
-     * @return \SoohIni\Ini
+     * @return \Sooh\Ini
      */
     public function initLoader($forStatic, $forPermanent=null)
     {
@@ -56,7 +56,7 @@ class Ini{
     protected static $_instance = null;
     /**
      * 获取当前运行中的唯一实例
-     * @return \SoohIni\Ini
+     * @return \Sooh\Ini
      */
     public static function getInstance()
     {
