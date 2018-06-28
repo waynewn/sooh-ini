@@ -86,4 +86,27 @@ class Ini{
     {
         $this->runtime->free();
     }
+    
+    protected $_shutdown=array();
+    public function registerShutdown($func,$identifier=null)
+    {
+        if($identifier===null){
+            $identifier='NotSet';
+        }
+        $this->_shutdown[$identifier][]=$func;
+    }
+    
+    public function onShutdown()
+    {
+        foreach ($this->_shutdown as $i=>$r){
+            foreach($r as $f){
+                try{
+                    call_user_func($f);
+                }catch(\ErrorException $ex){
+                    error_log("error on shutdown ($i) : ".$ex->getMessage());
+                }
+            }
+            unset($this->_shutdown[$i]);
+        }
+    }
 }

@@ -45,7 +45,7 @@
 Ini提供了三个public的属性应对上述情况：
 
  * statics  静态配置，这里主要存储系统初始化参数，一般不应该在运行时更改（并发覆盖啥的要自行考虑清除）
- * runtime  运行时，主要是当前进程处理中用的，每个请求之初应该清空，当框架不会自动释放时，请在收到请求之初执行 ->runtime->free(); (ini->onNewRequest()执行的)
+ * runtime  运行时，主要是当前进程处理中用的，每个请求之初应该清空，当框架不会自动释放时(比如swoole里处理任务的函数之前生成的实例)，请在收到请求之初执行 ->runtime->free(); (ini->onNewRequest()执行的)
  * permanent 永久的（比如redis），可跨进程间共享的，不是必须的，下一版本准备提供一个redis的
 
 针对statics，分别提供了\Sooh\IniClasses\Files 和 \Sooh\IniClasses\Url 两个获取配置的驱动
@@ -56,3 +56,13 @@ permanent 暂未开发
 **注意：由于在定位配置的时候使用了“.”，所以配置的键值部分不能有“.”!!!**
 
 详细用法参看 [Ini设计和使用](docs/Design.md)
+
+另外，当凑数也罢，这里增加了shutdown管理的相关方法，使用时要自行配套使用：
+
+function registerShutdown($func,$identifier)
+
+注册一个shutdown方法，当onShutdown的时候执行。（$identifier 是标识，如果执行时抛出异常了，error_log的时候会给出这个identifier）
+
+public function onShutdown()
+
+系统执行结束后的清理，需根据运行环境框架自行选择调用位置触发执行
