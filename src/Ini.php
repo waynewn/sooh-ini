@@ -58,9 +58,11 @@ class Ini{
      * 获取当前运行中的唯一实例
      * @return \Sooh\Ini
      */
-    public static function getInstance()
+    public static function getInstance($newInstance=null)
     {
-        if(self::$_instance==null){
+        if($newInstance!==null){
+            self::$_instance = $newInstance;
+        }elseif(self::$_instance==null){
             $c = get_called_class();
             self::$_instance = new $c;
         }

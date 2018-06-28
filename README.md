@@ -64,8 +64,14 @@ permanent 暂未开发
 
 function registerShutdown($func,$identifier)
 
-注册一个shutdown方法，当onShutdown的时候执行。（$identifier 是标识，如果执行时抛出异常了，error_log的时候会给出这个identifier）
+注册一个shutdown方法，当onShutdown的时候执行。（$identifier 是标识，
+如果执行时抛出异常了，error_log的时候会给出这个identifier）
 
 public function onShutdown()
 
 系统执行结束后的清理，需根据运行环境框架自行选择调用位置触发执行
+
+您也可以使用自己的Ini类替换使用：
+
+通过 \Sooh\Ini::getInstance(其他实例) 设置一下，之后 \Sooh\Ini::getInstance()获
+得的就是这个新的“其他实例”了
