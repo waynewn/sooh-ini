@@ -28,7 +28,7 @@
 
 ## 基本使用
 
-1） 初始化构建ini实例：
+1） 初始化构建ini实例(以目录模式为例)：
 
 `\Sooh\Ini::getInstance()->initLoader(new \Sooh\IniClasses\Files("/root/SingleService/_config"));`
 

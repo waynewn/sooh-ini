@@ -111,4 +111,13 @@ class Ini{
             unset($this->_shutdown[$i]);
         }
     }
+    
+    public function dump()
+    {
+        return array(
+            'statics'=> $this->statics->dump(),
+            'runtime'=>$this->runtime->dump(),
+            'permanent'=>(empty($this->permanent)?null:$this->permanent->dump())
+        );
+    }
 }

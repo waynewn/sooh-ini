@@ -34,6 +34,9 @@ class Files extends Vars{
         }else{
             $this->_vars[$name] = $this->loadModuleIniByFile($dir, $name);
         }
+        if($this->_vars[$name]===null){
+            unset($this->_vars[$name]);
+        }
         
         if($autoLoadMore && !empty($this->_vars[$name][$this->_nameNeedsMore])){
             $s = $this->_vars[$name][$this->_nameNeedsMore];
@@ -55,7 +58,12 @@ class Files extends Vars{
         foreach($sub as $k){
             if($k[0]!='.'){
                 $subname = substr($k, 0,strpos($k, '.'));
-                $tmp[$subname]=$this->loadFile($k);
+                $last = substr($k,-4);
+                if($last=='.php'){
+                    $tmp[$subname] = include $dir.'/'.$name.'/'.$k;
+                }elseif($last =='.ini'){
+                    $tmp[$subname]=parse_ini_string(file_get_contents($dir.'/'.$name.'/'.$k),true);
+                }
             }
         }
         return $tmp;
@@ -64,22 +72,13 @@ class Files extends Vars{
     protected function loadModuleIniByFile($dir,$name)
     {
         if(is_file($dir.'/'.$name.'.ini.php')){
-            return $this->loadFile($dir.'/'.$name.'.ini.php'); 
+            return include ($dir.'/'.$name.'.ini.php'); 
         }elseif(is_file($dir.'/'.$name.'.php')){
-            return $this->loadFile($dir.'/'.$name.'.php'); 
+            return include ($dir.'/'.$name.'.php'); 
         }elseif(is_file($dir.'/'.$name.'.ini')){
-            return $this->loadFile($dir.'/'.$name.'.ini');
+            return parse_ini_string(file_get_contents($dir.'/'.$name.'.ini'),true);
         }else{
             return null;
-        }
-    }
-
-    protected function loadFile($file)
-    {
-        if(substr($file, -4)=='.php'){
-            return include $file; 
-        }else{
-            return parse_ini_string(file_get_contents($file),true);
         }
     }
     
@@ -87,14 +86,15 @@ class Files extends Vars{
     {
         $tmp  = scandir($this->_baseDir);
         foreach($tmp as $k){
-            if($k[0]=='.' || $k==$except){
+            if($k[0]=='.'){
                 continue;
             }
             $pos = strpos($k, '.');
-            if($pos===false){
+            if($pos!==false){
+                $k = substr($k, 0, $pos);
+            }
+            if($k!=$except){
                 $this->loadModuleIni($k);
-            }else{
-                $this->loadModuleIni(substr($k, 0, $pos));
             }
         }
     }
