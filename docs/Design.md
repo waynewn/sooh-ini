@@ -81,18 +81,20 @@ onNewRequest() 如果使用环境下系统没自动释放，在要处理新的�
 构造函数 __construct($baseDir,$mainModule,$fieldNameNeedsMore='NeedsMoreIni')
 
 baseDir 是配置文件存放的路径，只能支持一级子目录，相关说明参看：[Ini文件格式](Ini.md)
-
-mainModule 需要加载的模块，其配置中fieldNameNeedsMore指定的那个字段里罗列了该模块需要的配置，会一并加载。
+mainModule 需要加载的模块；
+fieldNameNeedsMore指定的那个字段里罗列了该模块需要的其他配置，会一并加载。
 
 
 ### Sooh\IniClasses\Url
 
 通过http get 方式获取配置的封装
 
-构造函数 __construct($url,$mainModule,$fieldNameNeedsMore='NeedsMoreIni')
+构造函数 __construct($url, $mainModule,$fieldRoot='SoohIni',$fieldNameNeedsMore='NeedsMoreIni')
 
-url ： 获取配置的地址，要求http get方法，url的最后可以直接拼上逗号分割的配置名，
-返回json格式的值，其中包含SoohIni节点，里面放置所有配置。下面以作者用到的ini集中管理服务为例：
+url ： 获取配置的地址，要求http get方法，url的最后可以直接拼上逗号分割的配置名;
+fieldRoot: 返回的json格式数据里，ini是放在哪个节点下的,默认SoohIni
+fieldNameNeedsMore指定的那个字段里罗列了该模块需要的其他配置，会一并加载。
+下面以作者用到的ini集中管理服务为例：
 
         //session微服务启动时初始化
         $url = 'http://ServiceProxy/ini/broker/getini?name=';

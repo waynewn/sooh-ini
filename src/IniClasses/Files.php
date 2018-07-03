@@ -110,7 +110,8 @@ class Files extends Vars{
         if(!empty($this->_vars[$m])){
             $this->loadModuleIni($m);
             if(empty($this->_vars[$m])){
-                error_log("IniMissing : $m");
+                $tr = new \Exception;
+                error_log("error IniMissing after try: $m, ".$tr->getTraceAsString());
                 return null;
             }
         }

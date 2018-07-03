@@ -10,15 +10,17 @@ class Url extends Vars{
 
     protected $_mainModule;
     protected $_nameNeedsMore;
+    protected $_nameRoot;
     /**
      * 
      * @param string $url 格式是 http://x.x.x.x/xxx?paramname=
      * @param string $mainModule 主模块名
      */
-    public function __construct($url,$mainModule,$fieldNameNeedsMore='NeedsMoreIni') {
+    public function __construct($url,$mainModule,$fieldRoot='SoohIni',$fieldNameNeedsMore='NeedsMoreIni') {
         $this->_url = $url;
         $this->_mainModule = $mainModule;
         $this->_nameNeedsMore = $fieldNameNeedsMore;
+        $this->_nameRoot = $fieldRoot;
     }
     public function reload(){
         if(empty($this->_vars)){
@@ -41,22 +43,22 @@ class Url extends Vars{
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HEADER, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 1 );
         $output = curl_exec($ch);
         $err=curl_error($ch);
         if(!empty($err)){
-            error_log('IniMissing '.$url.' '.$err);
+            error_log('error IniMissing '.$url.' '.$err);
         }
         $tmp = json_decode($output,true);
         if (!is_array($tmp)){
-            error_log('IniMissing '.$url.' not-json returned:'.$output);
+            error_log('error IniMissing '.$url.' not-json returned:'.$output);
             $tmp = null;
         }
         curl_close($ch);
-        return $tmp['SoohIni'];
+        return $tmp[$this->_nameRoot];
     }
     
     protected function loadModuleIni($name,$autoLoadMore=true)
@@ -88,10 +90,11 @@ class Url extends Vars{
         }else{
             $m = substr($k, 0, $pos);
         }
-        if(!empty($this->_vars[$m])){
+        if(empty($this->_vars[$m])){
             $this->loadModuleIni($m);
             if(empty($this->_vars[$m])){
-                error_log("IniMissing : $m");
+                $tr = new \Exception;
+                error_log("error IniMissing after try: $m, ".$tr->getTraceAsString());
                 return null;
             }
         }
