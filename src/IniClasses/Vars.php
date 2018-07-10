@@ -1,6 +1,6 @@
 <?php
 namespace Sooh\IniClasses;
-class Vars{
+class Vars implements \Sooh\IniClasses\DriverInterface{
     protected $_vars=array();
     /**
      * 获取预定义配置 
@@ -42,7 +42,7 @@ class Vars{
      */
     public function sets($k,$v){
         $arrKeys = explode('.', $k);
-        $this->loopSets($this->_vars, $arrKeys, $v);
+        $this->_vars= $this->loopSets($this->_vars, $arrKeys, $v);
     }
     
     /**
@@ -51,15 +51,18 @@ class Vars{
      * @param type $arrKeys
      * @param type $v
      */
-    protected function loopSets(&$r, $arrKeys,$v){
+    protected function loopSets($r, $arrKeys,$v){
         $k = array_shift($arrKeys);
         if(sizeof($arrKeys)==0){
             $r[$k] = $v;
         }else{
-            $this->loopSets($r[$k], $arrKeys, $v);
+            $r[$k] = $this->loopSets($r[$k], $arrKeys, $v);
         }
+        return $r;
     }
-    
+    public function onNewRequest() {
+        
+    }
     public function reload(){}
     
     public function dump()

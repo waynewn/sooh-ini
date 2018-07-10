@@ -48,11 +48,12 @@
 Ini提供了三个public的属性应对上述情况：
 
  * statics  静态配置，这里主要存储系统初始化参数，一般不应该在运行时更改（并发覆盖啥的要自行考虑清除）
- * runtime  运行时，主要是当前进程处理中用的，每个请求之初应该清空，当框架不会自动释放时(比如swoole里处理任务的函数之前生成的实例)，请在收到请求之初执行 ->runtime->free(); (ini->onNewRequest()执行的)
+ * runtime  运行时，主要是当前进程处理中用的，每个请求之初应该清空，当框架不会自动释放时(比如swoole里处理任务的函数之前生成的实例)，请在收到请求之初执行 ini->onNewRequest()
  * permanent 永久的（比如redis），可跨进程间共享的，不是必须的，下一版本准备提供一个redis的
 
 针对statics，分别提供了\Sooh\IniClasses\Files 和 \Sooh\IniClasses\Url 两个获取配置的驱动
-permanent 暂未开发
+
+permanent 一般是自行定制的
 
 ## 详细使用和限制
 
@@ -75,3 +76,5 @@ public function onShutdown()
 
 通过 \Sooh\Ini::getInstance(其他实例) 设置一下，之后 \Sooh\Ini::getInstance()获
 得的就是这个新的“其他实例”了
+
+配置节点的名字里如果有"."，那么只能获取到上一级，之后的节点会取不到。

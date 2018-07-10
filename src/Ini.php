@@ -86,9 +86,26 @@ class Ini{
     
     public function onNewRequest()
     {
+        $this->statics->onNewRequest();
+        $this->runtime->onNewRequest();
+        if($this->permanent){
+            $this->permanent->onNewRequest();
+        }
         $this->runtime->free();
     }
-    
+    public function setMainModule($name)
+    {
+        $this->runtime->sets('SoohCurServModName',$name);
+    }
+    public function getMainModuleConfigItem($subname){
+        if($this->runtime){
+            $mName = $this->runtime->gets('SoohCurServModName');
+            if(!empty($mName)){
+                return $this->getIni($mName.'.'.$subname);
+            }
+        }
+        throw new \ErrorException("runtime->SoohCurServModName not Setted");
+    }
     protected $_shutdown=array();
     public function registerShutdown($func,$identifier=null)
     {
